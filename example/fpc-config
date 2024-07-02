@@ -1,6 +1,6 @@
 -Fu../sfml
 -Fu../engine
--FUtpu
+-FU$fpctarget
 -Sm
 -Mdelphi
 -Sh 
