@@ -66,3 +66,4 @@ __recovery/
 
 example/i386-win32
 example/x86_64-linux
+example/*.dll

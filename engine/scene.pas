@@ -5,7 +5,7 @@ interface
 uses
   Classes, SysUtils,
   SfmlSystem,SfmlWindow,SfmlGraphics,
-  Helpers, SpriteEffects, Profile ;
+  Helpers, SpriteEffects, Profile, Logger ;
 
 type
 
@@ -27,6 +27,7 @@ type
   protected
     window:TSfmlRenderTarget ;
     profile:TProfile ;
+    logger:TLogger ;
     wwidth:Integer ;
     wheight:Integer ;
     nextscene:TScene ;
@@ -41,6 +42,7 @@ type
   public
     procedure setWindow(Awindow:TSfmlRenderTarget; Awidth,Aheight:Integer);
     procedure setProfile(Aprofile:TProfile) ;
+    procedure setLogger(Alogger:TLogger) ;
     function getNextScene():TScene ;
     function getSubScene():TScene ;
     function getOverScene():TScene ;
@@ -99,6 +101,11 @@ end;
 procedure TScene.RenderFunc() ;
 begin
 end ;
+
+procedure TScene.setLogger(Alogger: TLogger);
+begin
+  logger:=Alogger ;
+end;
 
 procedure TScene.setProfile(Aprofile: TProfile);
 begin

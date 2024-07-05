@@ -5,7 +5,7 @@ interface
 uses
   Classes, SysUtils,
   SfmlGraphics,SfmlSystem,SfmlWindow,
-  Scene, Profile;
+  Scene, Profile, Logger;
 
 type
 
@@ -24,12 +24,15 @@ type
     gamecode:string ;
     closehandler:TScene ;
     profile:TProfile ;
+    logger:TLogger ;
     procedure initNewScene(scene:TScene) ;
   public
     constructor Create(width,height:Integer; Agamecode,Atitle:string; iconfile:string='') ;
     procedure setCloseHandler(Ascene:TScene) ;
     procedure setCustomProfile(profileclass:TProfileClass) ;
+    procedure setCustomLogger(loggerclass:TLoggerClass) ;
     function getProfile():TProfile ;
+    function getLogger():TLogger ;
     procedure Run(initscene:TScene) ;
     destructor Destroy() ; override ;
   end;
@@ -54,6 +57,7 @@ begin
   title:=Atitle ;
   gamecode:=Agamecode ;
   profile:=TProfile.Create(gamecode) ;
+  logger:=TLoggerNull.Create(gamecode) ;
   if iconfile<>'' then icon:=TSfmlImage.Create(iconfile) else icon:=nil ;
 end ;
 
@@ -178,6 +182,7 @@ rebuild_window:
     if tekscene.getOverScene()<>nil then tekscene.getOverScene().RenderFunc() ;
     window.Display;
   end;
+  logger.Free ;
   if tekscene<>closehandler then tekscene.UnInit() ;
   if closehandler<>nil then closehandler.UnInit() ;
 end;
@@ -193,6 +198,12 @@ begin
   profile:=profileclass.Create(gamecode) ;
 end;
 
+procedure TGame.setCustomLogger(loggerclass: TLoggerClass);
+begin
+  if logger<>nil then logger.Free ;
+  logger:=loggerclass.Create(gamecode) ;
+end;
+
 destructor TGame.Destroy();
 begin
   window.Free ;
@@ -206,12 +217,18 @@ begin
   Result:=profile ;
 end;
 
+function TGame.getLogger: TLogger;
+begin
+  Result:=logger ;
+end;
+
 procedure TGame.initNewScene(scene: TScene);
 begin
   if scene=nil then Exit ;
 
   scene.setWindow(window,mode.Width,mode.Height) ;
   scene.setProfile(profile) ;
+  scene.setLogger(logger) ;
   scene.Init() ;
 end;
 

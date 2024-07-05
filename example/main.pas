@@ -6,7 +6,7 @@ procedure Run() ;
 
 implementation
 uses SfmlSystem, SfmlWindow, SfmlGraphics, 
-  Game, Scene, Helpers, SfmlUtils ;
+  Game, Scene, Helpers, SfmlUtils, Logger ;
 
 type
   TMyScene = class(TScene)
@@ -28,6 +28,7 @@ begin
   info:=createText(Font,'Press Escape to exit',28,SfmlWhite) ;
   logo:=loadSprite('logo.png',[sloCentered]) ;
   totaltime:=0 ;
+  logger.WriteLog('Start scene') ;
   Result:=True ;
 end ;
 
@@ -60,7 +61,7 @@ end ;
 procedure Run() ;
 var game:TGame ;
 begin
-  game:=TGame.Create(800,600,'Example','Pascal game engine') ;
+  game:=TGame.Create(800,600,'PascalGameEngineExample','Pascal game engine') ;
   game.Run(TMyScene.Create()) ;
   game.Free ;
 end ;
