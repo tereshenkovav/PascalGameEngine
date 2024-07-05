@@ -29,7 +29,6 @@ type
   TLoggerBasic = class(TLogger)
   private
     f:text ;
-    function getLogFile():string ;
   public
     procedure InitLog() ; override ;
     procedure CloseLog() ; override ;
@@ -37,8 +36,7 @@ type
   end;
 
 implementation
-uses SysUtils,
-  Helpers ;
+uses HomeDir ;
 
 { TLogger }
 
@@ -80,7 +78,8 @@ end;
 procedure TLoggerBasic.InitLog() ;
 begin
   if initok then Exit ;
-  AssignFile(f,getLogFile()) ;
+  THomeDir.createDirInHomeIfNeed(gamedir) ;
+  AssignFile(f,THomeDir.getFileNameInHome(gamedir,'start.log')) ;
   ReWrite(f) ;
   initok:=True ;
 end;
@@ -91,18 +90,6 @@ begin
   Flush(f) ;
   CloseFile(f) ;
   initok:=False ;
-end;
-
-function TLoggerBasic.getLogFile(): string;
-var dir:string ;
-begin
-  {$ifdef unix}
-  dir:=GetEnvironmentVariable('HOME')+'/.local/share/'+gamedir ;
-  {$else}
-  dir:=GetEnvironmentVariable('LOCALAPPDATA')+PATH_SEP+gamedir ;
-  {$endif}
-  if not DirectoryExists(dir) then ForceDirectories(dir) ;
-  Result:=dir+PATH_SEP+'start.log' ;
 end;
 
 end.

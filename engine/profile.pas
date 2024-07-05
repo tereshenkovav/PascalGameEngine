@@ -15,7 +15,6 @@ type
     fullscr:Boolean ;
     soundon:Boolean ;
     actionconfig:TActionConfig ;
-    function getProfileFile():string ;
   protected
     procedure WriteExData(ini:TIniFile) ; virtual ;
     procedure ReadExData(ini:TIniFile) ; virtual ;
@@ -33,7 +32,10 @@ type
 
 implementation
 uses Classes, SysUtils,
-  Helpers ;
+  HomeDir ;
+
+const
+  PROFILE_FILE = 'profile.ini' ;
 
 { TProfile }
 
@@ -46,18 +48,6 @@ end;
 function TProfile.getActionConfig: TActionConfig;
 begin
   Result:=actionconfig ;
-end;
-
-function TProfile.getProfileFile(): string;
-var dir:string ;
-begin
-  {$ifdef unix}
-  dir:=GetEnvironmentVariable('HOME')+'/.local/share/'+gamedir ;
-  {$else}
-  dir:=GetEnvironmentVariable('LOCALAPPDATA')+PATH_SEP+gamedir ;
-  {$endif}
-  if not DirectoryExists(dir) then ForceDirectories(dir) ;
-  Result:=dir+PATH_SEP+'profile.ini' ;
 end;
 
 procedure TProfile.InitExData;
@@ -78,8 +68,8 @@ procedure TProfile.Load;
 var ini:TIniFile ;
     i:Integer ;
 begin
-  if FileExists(getProfileFile()) then begin
-    ini:=TIniFile.Create(getProfileFile()) ;
+  if FileExists(THomeDir.getFileNameInHome(gamedir,PROFILE_FILE)) then begin
+    ini:=TIniFile.Create(THomeDir.getFileNameInHome(gamedir,PROFILE_FILE)) ;
     fullscr:=ini.ReadBool('Profile','Fullscr',False) ;
     soundon:=ini.ReadBool('Profile','SoundOn',True) ;
     for i := 0 to actionconfig.Count-1 do
@@ -103,7 +93,8 @@ procedure TProfile.Save();
 var ini:TIniFile ;
     i:Integer ;
 begin
-  ini:=TIniFile.Create(getProfileFile()) ;
+  THomeDir.createDirInHomeIfNeed(gamedir) ;
+  ini:=TIniFile.Create(THomeDir.getFileNameInHome(gamedir,PROFILE_FILE)) ;
   ini.WriteBool('Profile','FullScr',fullscr) ;
   ini.WriteBool('Profile','SoundOn',soundon) ;
     for i := 0 to actionconfig.Count-1 do
@@ -130,4 +121,3 @@ begin
 end;
 
 end.
-
