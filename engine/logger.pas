@@ -17,6 +17,7 @@ type
     procedure InitLog() ; virtual ; abstract ;
     procedure CloseLog() ; virtual ; abstract ;
     procedure WriteLog(const s:string) ; virtual ; abstract ;
+    procedure WriteLogFmt(const fmt:string; params:array of const) ;
   end;
 
   TLoggerNull = class(TLogger)
@@ -36,7 +37,8 @@ type
   end;
 
 implementation
-uses HomeDir ;
+uses SysUtils,
+  HomeDir ;
 
 { TLogger }
 
@@ -51,6 +53,11 @@ destructor TLogger.Destroy();
 begin
   if initok then CloseLog() ;
 end;
+
+procedure TLogger.WriteLogFmt(const fmt:string; params:array of const) ;
+begin
+  WriteLog(Format(fmt,params)) ;
+end ;
 
 { TLoggerNull }
 

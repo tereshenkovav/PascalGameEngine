@@ -5,12 +5,13 @@ interface
 uses
   Classes, SysUtils,
   SfmlGraphics,
-  Scene, Helpers ;
+  Scene, Helpers, Logger ;
 
 type
 
   TOpenGLRender = class
   public
+    logger:TLogger ;
     procedure Render() ; virtual ; abstract ;
   end;
 
@@ -52,6 +53,7 @@ function TSceneOpenGL.Init():Boolean ;
 begin
   tex:=TSfmlRenderTexture.Create(w,h,true) ;
   spr:=TSfmlSprite.Create() ;
+  render.logger:=logger ;
   prepared:=False ;
 end ;
 
