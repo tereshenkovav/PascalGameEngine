@@ -1376,7 +1376,7 @@ const
   function SfmlRectangleShapeGetSize(const Shape: PSfmlRectangleShape): TSfmlVector2f; cdecl; external CSfmlGraphicsLibrary name 'sfRectangleShape_getSize';
 {$ENDIF}
 
-  function SfmlRenderTextureCreate(Width, Height: Cardinal; DepthBuffer: LongBool): PSfmlRenderTexture; cdecl; external CSfmlGraphicsLibrary name 'sfRenderTexture_create';
+  function SfmlRenderTextureCreate(Width, Height: Cardinal; DepthBuffer: Integer): PSfmlRenderTexture; cdecl; external CSfmlGraphicsLibrary name 'sfRenderTexture_create';
   procedure SfmlRenderTextureDestroy(RenderTexture: PSfmlRenderTexture); cdecl; external CSfmlGraphicsLibrary name 'sfRenderTexture_destroy';
   function SfmlRenderTextureSetActive(RenderTexture: PSfmlRenderTexture; Active: LongBool): LongBool; cdecl; external CSfmlGraphicsLibrary name 'sfRenderTexture_setActive';
   procedure SfmlRenderTextureDisplay(RenderTexture: PSfmlRenderTexture); cdecl; external CSfmlGraphicsLibrary name 'sfRenderTexture_display';
@@ -3270,7 +3270,10 @@ end;
 
 constructor TSfmlRenderTexture.Create(Width, Height: Cardinal; DepthBuffer: Boolean = False);
 begin
-  FHandle := SfmlRenderTextureCreate(Width, Height, DepthBuffer);
+  if DepthBuffer then
+    FHandle := SfmlRenderTextureCreate(Width, Height, 1)
+  else
+    FHandle := SfmlRenderTextureCreate(Width, Height, 0)
 end;
 
 destructor TSfmlRenderTexture.Destroy;
