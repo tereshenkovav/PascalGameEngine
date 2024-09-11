@@ -25,12 +25,15 @@ type
     closehandler:TScene ;
     profile:TProfile ;
     logger:TLogger ;
+    tekfps:Integer ;
+    showfpsintitle:Boolean ;
     procedure initNewScene(scene:TScene) ;
   public
     constructor Create(width,height:Integer; Agamecode,Atitle:string; iconfile:string='') ;
     procedure setCloseHandler(Ascene:TScene) ;
     procedure setCustomProfile(profileclass:TProfileClass) ;
     procedure setCustomLogger(loggerclass:TLoggerClass) ;
+    procedure enableFPSInTitle(value:Boolean) ;
     function getProfile():TProfile ;
     function getLogger():TLogger ;
     procedure Run(initscene:TScene) ;
@@ -58,11 +61,13 @@ begin
   gamecode:=Agamecode ;
   profile:=TProfile.Create(gamecode) ;
   logger:=TLoggerNull.Create(gamecode) ;
+  showfpsintitle:=False ;
   if iconfile<>'' then icon:=TSfmlImage.Create(iconfile) else icon:=nil ;
 end ;
 
 procedure TGame.Run(initscene:TScene);
-var lasttime,newtime:Single ;
+var lasttime,newtime,timefps:Single ;
+    calcfps:Integer ;
     sr:TSceneResult ;
     event:TSfmlEvent ;
     events:TUniList<TSfmlEventEx> ;
@@ -106,6 +111,14 @@ rebuild_window:
     end ;
 
     newtime:=clock.ElapsedTime.asSeconds() ;
+    timefps:=timefps+(newtime-lasttime) ;
+    Inc(calcfps) ;
+    if timefps>=1 then begin
+      tekfps:=calcfps ;
+      calcfps:=0 ;
+      timefps:=0 ;
+      if showfpsintitle then window.SetTitle(UTF8Decode(title)+' FPS: '+IntToStr(tekfps)) ;
+    end ;
 
     if window.HasFocus() then begin
 
@@ -210,6 +223,11 @@ begin
   if icon<>nil then icon.Free ;
   
   inherited Destroy();
+end;
+
+procedure TGame.enableFPSInTitle(value: Boolean);
+begin
+  showfpsintitle:=value ;
 end;
 
 function TGame.getProfile: TProfile;
