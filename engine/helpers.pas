@@ -15,6 +15,7 @@ TUniList<T> = class(TFPGList<T>)
 private
 public
   procedure AddRange(src:TUniList<T>) ;
+  function ExtractAt(idx:Integer):T ;
 end;
 
 TUniDictionary<K,V> = class(TFPGMap<K,V>)
@@ -72,6 +73,12 @@ var el:T ;
 begin
   for el in src do
     Self.Add(el) ;
+end ;
+
+function TUniList<T>.ExtractAt(idx:Integer):T ;
+begin
+  Result:=Items[idx] ;
+  Remove(Items[idx]) ;
 end ;
 
 function TUniDictionary<K,V>.ContainsKey(const key:K):Boolean ;

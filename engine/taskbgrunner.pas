@@ -33,6 +33,26 @@ type
 
 implementation
 
+{$ifdef fpc}
+type
+  TTaskThread = class(TThread)
+  private
+    runner:TTaskBGRunner ;
+    task:TBackgroundTask ;
+  protected
+    procedure Execute ; override ;
+  end;
+
+{ TTaskThread }
+
+procedure TTaskThread.Execute;
+begin
+  runner.isready:=False ;
+  runner.res:=task(runner) ;
+  runner.isready:=True ;
+end;
+{$endif}
+
 { TTaskBGRunner }
 
 function TTaskBGRunner.getProgressMessage: string;
@@ -59,6 +79,12 @@ procedure TTaskBGRunner.RunTaskIfNot(task: TBackgroundTask);
 begin
   if thread<>nil then Exit ;
 
+  {$ifdef fpc}
+  thread:=TTaskThread.Create(True) ;
+  TTaskThread(thread).runner:=Self ;
+  TTaskThread(thread).task:=task ;
+  thread.Resume() ;
+  {$else}
   thread:=TThread.CreateAnonymousThread(procedure()
   begin
     isready:=False ;
@@ -66,6 +92,7 @@ begin
     isready:=True ;
   end) ;
   thread.Start() ;
+  {$endif}
 end;
 
 procedure TTaskBGRunner.SetMessage(s: string);
