@@ -55,6 +55,7 @@ type
   end;
 
 function IfThen(b:Boolean; v1,v2:TMirrorTypeSet):TMirrorTypeSet ; overload ;
+function IfThen(b:Boolean; c1,c2:TSfmlColor):TSfmlColor ; overload ;
 
 implementation
 
@@ -65,6 +66,11 @@ function IfThen(b:Boolean; v1,v2:TMirrorTypeSet):TMirrorTypeSet ; overload ;
 begin
   if b then Result:=v1 else Result:=v2 ;
 end;
+
+function IfThen(b:Boolean; c1,c2:TSfmlColor):TSfmlColor ; overload ;
+begin
+  if b then Result:=c1 else Result:=c2 ;
+end ;
 
 { TScene }
 
