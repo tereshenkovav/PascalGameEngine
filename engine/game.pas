@@ -191,8 +191,8 @@ rebuild_window:
 
     window.Clear(SfmlBlack);
     tekscene.RenderFunc() ;
-    if subscene<>nil then subscene.RenderFunc() ;
     if tekscene.getOverScene()<>nil then tekscene.getOverScene().RenderFunc() ;
+    if subscene<>nil then subscene.RenderFunc() ;
     window.Display;
   end;
   logger.Free ;
