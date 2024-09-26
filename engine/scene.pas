@@ -1,4 +1,4 @@
-unit Scene;
+﻿unit Scene;
 
 interface
 
@@ -39,6 +39,8 @@ type
     procedure drawSpriteMirr(spr:TSfmlSprite; x,y:Single; mirrors:TMirrorTypeSet) ;
     procedure drawText(text:TSfmlText; x,y:Single) ;
     procedure drawTextCentered(text:TSfmlText; x,y:Single) ;
+    procedure drawTextInBlockWidth(text: TSfmlText; str:string;
+      x, y: Single; width:Integer; redlinewidth:Integer);
   public
     procedure setWindow(Awindow:TSfmlRenderTarget; Awidth,Aheight:Integer);
     procedure setProfile(Aprofile:TProfile) ;
@@ -178,6 +180,40 @@ procedure TScene.drawTextCentered(text: TSfmlText; x,
 begin
   text.Position:=SfmlVector2f(x-text.LocalBounds.Width/2,y) ;
   window.Draw(text) ;
+end;
+
+// Для работы переноса строк нужно, чтобы после переноса \n был пробел
+procedure TScene.drawTextInBlockWidth(text: TSfmlText; str:string;
+  x, y: Single; width:Integer; redlinewidth:Integer);
+var words:TArray<string> ;
+    line:string ;
+    i:Integer ;
+    isnewline:Boolean ;
+begin
+  words:=str.Split([' '],TStringSplitOptions.ExcludeEmpty) ;
+
+  if Length(words)=0 then Exit ;
+
+  line:=StringOfChar(' ',redlinewidth)+words[0] ;
+  for i := 1 to Length(words)-1 do begin
+    text.UnicodeString:=UTF8Decode(line+' '+words[i]) ;
+    isnewline:=line.EndsWith(#10) ;
+    if (text.LocalBounds.Width>=width)or isnewline then begin
+      line:=line.Replace(#10,'') ;
+      text.UnicodeString:=UTF8Decode(line) ;
+      text.Position:=SfmlVector2f(x,y) ;
+      window.Draw(text) ;
+      y:=y+SfmlFontGetLineSpacing(text.Font,text.CharacterSize) ;
+      line:=words[i] ;
+      if isnewline then line:=StringOfChar(' ',redlinewidth)+line ;
+    end
+    else
+      line:=line+' '+words[i] ;
+  end;
+  if line.Length>0 then begin
+    text.Position:=SfmlVector2f(x,y) ;
+    window.Draw(text) ;
+  end;
 end;
 
 { TSfmlEventEx }
