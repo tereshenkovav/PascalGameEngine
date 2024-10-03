@@ -123,7 +123,11 @@ rebuild_window:
     if window.HasFocus() then begin
 
     if subscene<>nil then activescene:=subscene else activescene:=tekscene ;
-    if activescene.getOverScene()<>nil then activescene.getOverScene().FrameFunc(newtime-lasttime,events) ;
+    if activescene.getOverScene()<>nil then begin
+      activescene.getOverScene().setMousePos(window.MousePosition.X,window.MousePosition.Y) ;
+      activescene.getOverScene().FrameFunc(newtime-lasttime,events) ;
+    end ;
+    activescene.setMousePos(window.MousePosition.X,window.MousePosition.Y) ;
     sr:=activescene.FrameFunc(newtime-lasttime,events) ;
 
     case sr of

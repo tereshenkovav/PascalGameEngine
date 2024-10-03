@@ -34,6 +34,7 @@ type
     subscene:TScene ;
     overscene:TScene ;
     newwindowtitle:string ;
+    mousex,mousey:Integer ;
     procedure drawSprite(spr:TSfmlSprite; x,y:Single) ;
     procedure drawSpriteEffect(se:TSpriteEffect; x,y:Single) ;
     procedure drawSpriteMirr(spr:TSfmlSprite; x,y:Single; mirrors:TMirrorTypeSet) ;
@@ -45,6 +46,7 @@ type
     procedure setWindow(Awindow:TSfmlRenderTarget; Awidth,Aheight:Integer);
     procedure setProfile(Aprofile:TProfile) ;
     procedure setLogger(Alogger:TLogger) ;
+    procedure setMousePos(Ax,Ay:Integer) ;
     function getNextScene():TScene ;
     function getSubScene():TScene ;
     function getOverScene():TScene ;
@@ -215,6 +217,12 @@ begin
     window.Draw(text) ;
   end;
 end;
+
+procedure TScene.setMousePos(Ax,Ay:Integer) ;
+begin
+  mousex:=Ax ;
+  mousey:=Ay ;
+end ;
 
 { TSfmlEventEx }
 
