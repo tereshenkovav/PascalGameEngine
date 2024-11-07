@@ -51,6 +51,7 @@ type
     function getSubScene():TScene ;
     function getOverScene():TScene ;
     function getNewWindowTitle():string ;
+    procedure exitSubScene() ;
     function Init():Boolean ; virtual ;
     function FrameFunc(dt:Single; events:TUniList<TSfmlEventEx>):TSceneResult ; virtual ;
     procedure RenderFunc() ; virtual ;
@@ -107,6 +108,11 @@ function TScene.getSubScene: TScene;
 begin
   Result:=subscene ;
 end;
+
+procedure TScene.exitSubScene() ;
+begin
+  subscene:=nil ;
+end ;
 
 procedure TScene.RenderFunc() ;
 begin

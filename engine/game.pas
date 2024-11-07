@@ -172,6 +172,7 @@ rebuild_window:
       TSceneResult.ExitSubScene: begin
         subscene.UnInit() ;
         subscene:=nil ;
+        tekscene.exitSubScene() ;
         continue ;
       end ;
     end ;
