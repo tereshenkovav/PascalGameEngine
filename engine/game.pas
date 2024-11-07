@@ -161,7 +161,7 @@ rebuild_window:
         goto rebuild_window;
       end;
       TSceneResult.SetWindowTitle: begin
-        title:=tekscene.getNewWindowTitle() ;
+        title:=activescene.getNewWindowTitle() ;
         window.SetTitle(UTF8Decode(title)) ;
       end;
       TSceneResult.SetSubScene: begin
