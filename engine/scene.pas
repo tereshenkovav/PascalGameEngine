@@ -219,6 +219,8 @@ begin
       line:=line+' '+words[i] ;
   end;
   if line.Length>0 then begin
+    line:=line.Replace(#10,'') ;
+    text.UnicodeString:=UTF8Decode(line) ;
     text.Position:=SfmlVector2f(x,y) ;
     window.Draw(text) ;
   end;
