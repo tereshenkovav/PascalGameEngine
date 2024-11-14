@@ -56,6 +56,7 @@ type
     function FrameFunc(dt:Single; events:TUniList<TSfmlEventEx>):TSceneResult ; virtual ;
     procedure RenderFunc() ; virtual ;
     procedure UnInit() ; virtual ;
+    procedure FocusChanged(isfocus:Boolean) ; virtual ;
     destructor Destroy() ; override ;
   end;
 
@@ -87,6 +88,10 @@ end ;
 function TScene.FrameFunc(dt:Single; events:TUniList<TSfmlEventEx>):TSceneResult ;
 begin
   Result:=TSceneResult.Normal ;
+end ;
+
+procedure TScene.FocusChanged(isfocus:Boolean) ;
+begin
 end ;
 
 function TScene.getNewWindowTitle: string;

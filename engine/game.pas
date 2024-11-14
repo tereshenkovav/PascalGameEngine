@@ -73,6 +73,7 @@ var lasttime,newtime,timefps:Single ;
     events:TUniList<TSfmlEventEx> ;
     activescene:TScene ;
     closehandled:Boolean ;
+    lastfocused:Boolean ;
 label rebuild_window ;
 begin
   profile.Load() ;
@@ -99,6 +100,7 @@ rebuild_window:
 
   clock:=TSfmlClock.Create() ;
   lasttime:=clock.ElapsedTime.AsSeconds() ;
+  lastfocused:=True ;
   while window.IsOpen do begin
     closehandled:=False ;
     events.Clear ;
@@ -129,6 +131,13 @@ rebuild_window:
     end ;
     activescene.setMousePos(window.MousePosition.X,window.MousePosition.Y) ;
     sr:=activescene.FrameFunc(newtime-lasttime,events) ;
+
+    if not lastfocused then begin
+      if activescene.getOverScene()<>nil then
+        activescene.getOverScene().FocusChanged(true) ;
+      activescene.FocusChanged(true) ;
+      lastfocused:=True ;
+    end ;
 
     case sr of
       TSceneResult.Close: begin
@@ -177,7 +186,15 @@ rebuild_window:
       end ;
     end ;
 
-    end; // window.hasFocus
+    end // window.hasFocus
+    else begin
+      if lastfocused then begin
+        if activescene.getOverScene()<>nil then
+          activescene.getOverScene().FocusChanged(false) ;
+        activescene.FocusChanged(false) ;
+        lastfocused:=False ;
+      end;
+    end;
 
     lasttime:=newtime ;
 
