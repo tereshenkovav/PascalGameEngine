@@ -26,6 +26,7 @@ type
     procedure Play() ;
     procedure Stop() ;
     procedure PlayOnce() ;
+    procedure SetFrame(frame:Integer);
   end;
 
 implementation
@@ -135,6 +136,11 @@ procedure TSfmlAnimation.Stop;
 begin
   playstate:=psStopped ;
 end;
+
+procedure TSfmlAnimation.SetFrame(frame:Integer);
+begin
+  setTexture(frames[frame]) ;
+end ;
 
 procedure TSfmlAnimation.Update(dt: Single);
 var sec_per_frame:Single ;
