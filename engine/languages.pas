@@ -22,6 +22,7 @@ type
     procedure switchCurrent() ;
     function getCurrent():string ;
     function formatFileNameWithLang(filename:string):string ;
+    function getAll():TStringList ;
   end;
 
 implementation
@@ -78,6 +79,11 @@ begin
   Inc(tek) ;
   if tek>=alllang.Count then tek:=0 ;
 end;
+
+function TLanguages.getAll():TStringList ;
+begin
+  Result:=alllang ;
+end ;
 
 end.
 

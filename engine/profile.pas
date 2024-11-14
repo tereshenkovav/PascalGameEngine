@@ -14,6 +14,7 @@ type
     gamedir:string ;
     fullscr:Boolean ;
     soundon:Boolean ;
+    musicon:Boolean ;
     actionconfig:TActionConfig ;
   protected
     procedure WriteExData(ini:TIniFile) ; virtual ;
@@ -25,6 +26,8 @@ type
     function isFullScreen():Boolean ;
     procedure switchSoundOn() ;
     function isSoundOn():Boolean ;
+    procedure switchMusicOn() ;
+    function isMusicOn():Boolean ;
     function getActionConfig():TActionConfig ;
     procedure Load() ;
     procedure Save() ;
@@ -64,6 +67,11 @@ begin
   Result:=soundon ;
 end;
 
+function TProfile.isMusicOn: Boolean;
+begin
+  Result:=musicon ;
+end;
+
 procedure TProfile.Load;
 var ini:TIniFile ;
     i:Integer ;
@@ -72,6 +80,7 @@ begin
     ini:=TIniFile.Create(THomeDir.getFileNameInHome(gamedir,PROFILE_FILE)) ;
     fullscr:=ini.ReadBool('Profile','Fullscr',False) ;
     soundon:=ini.ReadBool('Profile','SoundOn',True) ;
+    musicon:=ini.ReadBool('Profile','MusicOn',True) ;
     for i := 0 to actionconfig.Count-1 do
       actionconfig.setActionFromPacked(i,
         ini.ReadString('Actions','Action_'+actionconfig.getActionName(i),'')) ;
@@ -81,6 +90,7 @@ begin
   else begin
     fullscr:=False ;
     soundon:=True ;
+    musicon:=True ;
     InitExData() ;
   end;
 end;
@@ -97,6 +107,7 @@ begin
   ini:=TIniFile.Create(THomeDir.getFileNameInHome(gamedir,PROFILE_FILE)) ;
   ini.WriteBool('Profile','FullScr',fullscr) ;
   ini.WriteBool('Profile','SoundOn',soundon) ;
+  ini.WriteBool('Profile','MusicOn',soundon) ;
     for i := 0 to actionconfig.Count-1 do
       ini.WriteString('Actions','Action_'+actionconfig.getActionName(i),
         actionconfig.getActionPacked(i)) ;
@@ -113,6 +124,12 @@ end;
 procedure TProfile.switchSoundOn;
 begin
   soundon:=not soundon ;
+  Save() ;
+end;
+
+procedure TProfile.switchMusicOn;
+begin
+  musicon:=not musicon ;
   Save() ;
 end;
 
