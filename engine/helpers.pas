@@ -43,6 +43,7 @@ end;
 {$endif}
 
 function readAllText(filename:string):string ;
+procedure writeAllText(filename:string; const data:string) ;
 
 // Конвертирует Int в Str с учетом нуля. Т.е., вернет '', если 0
 function IntToStrWt0(a:Integer):string ;
@@ -120,6 +121,19 @@ begin
   end ;
   {$else}
   Result:=TFile.ReadAllText(filename) ;
+  {$endif}
+end ;
+
+procedure writeAllText(filename:string; const data:string) ;
+begin
+  {$ifdef fpc}
+  with TStringList.Create do begin
+    Text:=data ;
+    SaveToFile(FileName) ;
+    Free ;
+  end ;
+  {$else}
+  TFile.WriteAllText(filename,data) ;
   {$endif}
 end ;
 
