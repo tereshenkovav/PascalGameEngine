@@ -122,9 +122,10 @@ rebuild_window:
       if showfpsintitle then window.SetTitle(UTF8Decode(title)+' FPS: '+IntToStr(tekfps)) ;
     end ;
 
+    if subscene<>nil then activescene:=subscene else activescene:=tekscene ;
+
     if window.HasFocus() then begin
 
-    if subscene<>nil then activescene:=subscene else activescene:=tekscene ;
     if activescene.getOverScene()<>nil then begin
       activescene.getOverScene().setMousePos(window.MousePosition.X,window.MousePosition.Y) ;
       activescene.getOverScene().FrameFunc(newtime-lasttime,events) ;
