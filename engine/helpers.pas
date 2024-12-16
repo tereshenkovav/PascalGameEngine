@@ -20,10 +20,10 @@ end;
 
 TUniDictionary<K,V> = class(TFPGMap<K,V>)
 private
-  FKeys:TUniList<K> ;
+  FKeys:TArray<K> ;
 public
   function ContainsKey(const key:K):Boolean ;
-  function AllKeys():TUniList<K> ;
+  function AllKeys():TArray<K> ;
 end;
 
 {$else}
@@ -87,13 +87,12 @@ begin
   Result:=IndexOf(key)<>-1 ;
 end ;
 
-function TUniDictionary<K,V>.AllKeys():TUniList<K> ;
+function TUniDictionary<K,V>.AllKeys():TArray<K> ;
 var i:Integer ;
 begin
-  if FKeys=nil then FKeys:=TUniList<K>.Create ;
-  FKeys.Clear() ;
+  SetLength(FKeys,Count) ;
   for i:=0 to Count-1 do
-    FKeys.Add(GetKey(i)) ;
+    FKeys[i]:=GetKey(i) ;
   Result:=FKeys ;
 end ;
 
