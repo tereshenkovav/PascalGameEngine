@@ -50,6 +50,7 @@ type
   public
     constructor Create() ;
     destructor Destroy; override ;
+    function SystemSection():TWriterAPI ;
     function Section(name:string):TWriterAPI ;
     function WriteObject(name:string; obj:TObject; writer:TProcWriter):Boolean ;
     function WriteRecord<T>(name:string; rec:T; writer:TProcWriterRecord):Boolean ;
@@ -71,6 +72,7 @@ type
     constructor Create(const data:string) ;
     destructor Destroy; override ;
     function Section(name:string):TReaderAPI ;
+    function SystemSection():TReaderAPI ;
     function ReadObject(name:string; obj:TObject; reader:TProcReader):Boolean ;
     function ReadRecord<T>(name:string; recp:Pointer; reader:TProcReaderRecord):Boolean ;
     function ReadObjectList(name:string; list:TUniList<TObject>; reader:TProcReader;
@@ -82,6 +84,14 @@ type
   end;
 
 implementation
+
+const
+// Случайная секция для системных переменных
+  SYSTEM_SECTION_NAME='systemsection_x0yivoa604' ;
+// Случайный ключ для версии сериализатора
+  OBJECTSAVER_VERSION_KEY = 'objectsaver_version_4fnga9qt7o';
+// Версия сериализатора, вшивается в каждый сохраненный JSON
+  OBJECTSAVER_VERSION = 1 ;
 
 { TWriterAPI }
 
@@ -205,6 +215,7 @@ constructor TObjectSaver.Create;
 begin
   jsroot:=TJSONObject.Create() ;
   writers:=TUniDictionary<string,TWriterAPI>.Create() ;
+  SystemSection().WriteInteger(OBJECTSAVER_VERSION_KEY,OBJECTSAVER_VERSION) ;
 end;
 
 destructor TObjectSaver.Destroy;
@@ -232,6 +243,11 @@ begin
     AddToRoot(name,jsobj) ;
   end;
   Result:=writers[name] ;
+end;
+
+function TObjectSaver.SystemSection: TWriterAPI;
+begin
+  Result:=Section(SYSTEM_SECTION_NAME) ;
 end;
 
 function TObjectSaver.WriteArrayInteger(name: string; arr: TArray<Integer>): Boolean;
@@ -328,6 +344,8 @@ begin
   {$else}
   jsroot:=TJSONObject.ParseJSONValue(data) as TJSONObject;
   {$endif}
+
+  // ToDo: выдавать ошибку, если OBJECTSAVER_VERSION в файле выше, чем у самого класса
 end;
 
 destructor TObjectLoader.Destroy;
@@ -448,6 +466,11 @@ begin
   if not readers.ContainsKey(name) then
     readers.Add(name,TReaderAPI.Create(GetObjectFromRoot(name))) ;
   Result:=readers[name] ;
+end;
+
+function TObjectLoader.SystemSection: TReaderAPI;
+begin
+  Result:=Section(SYSTEM_SECTION_NAME) ;
 end;
 
 end.
