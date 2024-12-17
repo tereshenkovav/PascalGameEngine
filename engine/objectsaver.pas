@@ -45,6 +45,8 @@ type
   private
     jsroot:TJSONObject ;
     writers:TUniDictionary<string,TWriterAPI> ;
+    procedure AddToRoot(name:string; jsarr:TJSONArray) ; overload ;
+    procedure AddToRoot(name:string; jsarr:TJSONObject) ; overload ;
   public
     constructor Create() ;
     destructor Destroy; override ;
@@ -63,6 +65,8 @@ type
   private
     jsroot:TJSONObject ;
     readers:TUniDictionary<string,TReaderAPI> ;
+    function getObjectFromRoot(name:string):TJSONObject ;
+    function getArrayFromRoot(name:string):TJSONArray ;
   public
     constructor Create(const data:string) ;
     destructor Destroy; override ;
@@ -130,8 +134,15 @@ begin
 end;
 
 function TReaderAPI.isNameExist(name: string): Boolean;
+{$ifdef fpc}
+var v:TJSONData ;
+{$endif}
 begin
-
+  {$ifdef fpc}
+  Result:=jsvars.Find(name,v) ;
+  {$else}
+  Result:=jsvars.FindValue(name)<>nil ;
+  {$endif}
 end;
 
 function TReaderAPI.ReadBoolean(name: string; def: Boolean): Boolean;
@@ -172,6 +183,24 @@ end;
 
 { TObjectSaver }
 
+procedure TObjectSaver.AddToRoot(name:string; jsarr: TJSONObject);
+begin
+  {$ifdef fpc}
+  jsroot.Add(name,jsarr) ;
+  {$else}
+  jsroot.AddPair(name,jsarr) ;
+  {$endif}
+end;
+
+procedure TObjectSaver.AddToRoot(name:string; jsarr: TJSONArray);
+begin
+  {$ifdef fpc}
+  jsroot.Add(name,jsarr) ;
+  {$else}
+  jsroot.AddPair(name,jsarr) ;
+  {$endif}
+end;
+
 constructor TObjectSaver.Create;
 begin
   jsroot:=TJSONObject.Create() ;
@@ -200,11 +229,7 @@ begin
   if not writers.ContainsKey(name) then begin
     jsobj:=TJSONObject.Create ;
     writers.Add(name,TWriterAPI.Create(jsobj)) ;
-    {$ifdef fpc}
-    jsroot.Add(name,jsobj) ;
-    {$else}
-    jsroot.AddPair(name,jsobj) ;
-    {$endif}
+    AddToRoot(name,jsobj) ;
   end;
   Result:=writers[name] ;
 end;
@@ -216,11 +241,7 @@ begin
   jsarr:=TJSONArray.Create() ;
   for v in arr do
      jsarr.Add(v) ;
-  {$ifdef fpc}
-  jsroot.Add(name,jsarr) ;
-  {$else}
-  jsroot.AddPair(name,jsarr) ;
-  {$endif}
+  AddToRoot(name,jsarr) ;
   Result:=True ;
 end;
 
@@ -232,11 +253,7 @@ begin
   jsarr:=TJSONArray.Create() ;
   for s in arr do
      jsarr.Add(s) ;
-  {$ifdef fpc}
-  jsroot.Add(name,jsarr) ;
-  {$else}
-  jsroot.AddPair(name,jsarr) ;
-  {$endif}
+  AddToRoot(name,jsarr) ;
   Result:=True ;
 end;
 
@@ -261,11 +278,7 @@ begin
     wapi.Free ;
     jsarr.Add(jsobj) ;
   end;
-  {$ifdef fpc}
-  jsroot.Add(name,jsarr) ;
-  {$else}
-  jsroot.AddPair(name,jsarr) ;
-  {$endif}
+  AddToRoot(name,jsarr) ;
   Result:=True ;
 end;
 
@@ -290,11 +303,7 @@ begin
     wapi.Free ;
     jsarr.Add(jsobj) ;
   end;
-  {$ifdef fpc}
-  jsroot.Add(name,jsarr) ;
-  {$else}
-  jsroot.AddPair(name,jsarr) ;
-  {$endif}
+  AddToRoot(name,jsarr) ;
   Result:=True ;
 end;
 
@@ -305,11 +314,7 @@ begin
   jsarr:=TJSONArray.Create() ;
   for s in list do
     jsarr.Add(s) ;
-  {$ifdef fpc}
-  jsroot.Add(name,jsarr) ;
-  {$else}
-  jsroot.AddPair(name,jsarr) ;
-  {$endif}
+  AddToRoot(name,jsarr) ;
   Result:=True ;
 end;
 
@@ -332,16 +337,30 @@ begin
   inherited Destroy ;
 end;
 
+function TObjectLoader.getArrayFromRoot(name: string): TJSONArray;
+begin
+  {$ifdef fpc}
+  jsroot.Find(name,Result) ;
+  {$else}
+  Result:=jsroot.Values[name] as TJSONArray ;
+  {$endif}
+end;
+
+function TObjectLoader.getObjectFromRoot(name: string): TJSONObject;
+begin
+  {$ifdef fpc}
+  jsroot.Find(name,Result) ;
+  {$else}
+  Result:=jsroot.Values[name] as TJSONObject ;
+  {$endif}
+end;
+
 function TObjectLoader.ReadArrayInteger(name: string;
   var arr: TArray<Integer>): Boolean;
 var jsarr:TJSONArray ;
     i:Integer ;
 begin
-  {$ifdef fpc}
-  jsroot.Find(name,jsarr) ;
-  {$else}
-  jsarr:=jsroot.Values[name] as TJSONArray ;
-  {$endif}
+  jsarr:=GetArrayFromRoot(name) ;
 
   SetLength(arr,jsarr.Count) ;
   for i:=0 to jsarr.Count-1 do
@@ -353,11 +372,7 @@ function TObjectLoader.ReadArrayString(name: string;
 var jsarr:TJSONArray ;
     i:Integer ;
 begin
-  {$ifdef fpc}
-  jsroot.Find(name,jsarr) ;
-  {$else}
-  jsarr:=jsroot.Values[name] as TJSONArray ;
-  {$endif}
+  jsarr:=GetArrayFromRoot(name) ;
 
   SetLength(arr,jsarr.Count) ;
   for i:=0 to jsarr.Count-1 do
@@ -377,11 +392,7 @@ var jsarr:TJsonArray ;
     obj:TObject ;
     rapi:TReaderAPI ;
 begin
-  {$ifdef fpc}
-  jsroot.Find(name,jsarr) ;
-  {$else}
-  jsarr:=jsroot.Values[name] as TJSONArray ;
-  {$endif}
+  jsarr:=GetArrayFromRoot(name) ;
 
   list.Clear() ;
   for i:=0 to jsarr.Count-1 do begin
@@ -408,11 +419,7 @@ var jsarr:TJsonArray ;
     rec:T ;
     rapi:TReaderAPI ;
 begin
-  {$ifdef fpc}
-  jsroot.Find(name,jsarr) ;
-  {$else}
-  jsarr:=jsroot.Values[name] as TJSONArray ;
-  {$endif}
+  jsarr:=GetArrayFromRoot(name) ;
 
   list.Clear() ;
   for i:=0 to jsarr.Count-1 do begin
@@ -429,11 +436,7 @@ function TObjectLoader.ReadStringList(name: string; list: TStringList): Boolean;
 var jsarr:TJSONArray ;
     i:Integer ;
 begin
-  {$ifdef fpc}
-  jsroot.Find(name,jsarr) ;
-  {$else}
-  jsarr:=jsroot.Values[name] as TJSONArray ;
-  {$endif}
+  jsarr:=GetArrayFromRoot(name) ;
 
   list.Clear() ;
   for i:=0 to jsarr.Count-1 do
@@ -441,17 +444,9 @@ begin
 end;
 
 function TObjectLoader.Section(name: string): TReaderAPI;
-var jsobj:TJSONObject ;
 begin
-  if not readers.ContainsKey(name) then begin
-    {$ifdef fpc}
-    jsroot.Find(name,jsobj) ;
-    {$else}
-    jsobj:=jsroot.Values[name] as TJSONObject ;
-    {$endif}
-
-    readers.Add(name,TReaderAPI.Create(jsobj)) ;
-  end;
+  if not readers.ContainsKey(name) then
+    readers.Add(name,TReaderAPI.Create(GetObjectFromRoot(name))) ;
   Result:=readers[name] ;
 end;
 
