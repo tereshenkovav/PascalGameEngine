@@ -57,6 +57,7 @@ type
     function WriteObjectList(name:string; list:TUniList<TObject>; writer:TProcWriter):Boolean ;
     function WriteRecordList<T>(name:string; list:TUniList<T>; writer:TProcWriterRecord):Boolean ;
     function WriteStringList(name:string; list:TStringList):Boolean ;
+    function WriteStringDictionary(name:string; dict:TUniDictionary<string,string>):Boolean ;
     function WriteArrayInteger(name:string; arr:TArray<Integer>):Boolean ;
     function WriteArrayString(name:string; arr:TArray<String>):Boolean ;
     function getData():string ;
@@ -79,6 +80,7 @@ type
       objclass:TClass):Boolean ;
     function ReadRecordList<T>(name:string; list:TUniList<T>; reader:TProcReaderRecord):Boolean ;
     function ReadStringList(name:string; list:TStringList):Boolean ;
+    function ReadStringDictionary(name:string; dict:TUniDictionary<string,string>):Boolean ;
     function ReadArrayInteger(name:string; var arr:TArray<Integer>):Boolean ;
     function ReadArrayString(name:string; var arr:TArray<string>):Boolean ;
   end;
@@ -323,6 +325,28 @@ begin
   Result:=True ;
 end;
 
+function TObjectSaver.WriteStringDictionary(name: string;
+  dict: TUniDictionary<string, string>): Boolean;
+var jsarr:TJsonArray ;
+    jsobj:TJSONObject ;
+    key:string ;
+begin
+  jsarr:=TJSONArray.Create() ;
+  for key in dict.AllKeys do begin
+    jsobj:=TJSONObject.Create() ;
+    {$ifdef fpc}
+    jsobj.Add('key',key) ;
+    jsobj.Add('value',dict[key]) ;
+    {$else}
+    jsobj.AddPair('key',key) ;
+    jsobj.AddPair('value',dict[key]) ;
+    {$endif}
+    jsarr.Add(jsobj) ;
+  end;
+  AddToRoot(name,jsarr) ;
+  Result:=True ;
+end;
+
 function TObjectSaver.WriteStringList(name: string; list: TStringList): Boolean;
 var jsarr:TJsonArray ;
     s:string ;
@@ -448,6 +472,24 @@ begin
   end;
 
   Result:=True ;
+end;
+
+function TObjectLoader.ReadStringDictionary(name: string;
+  dict: TUniDictionary<string, string>): Boolean;
+var jsarr:TJSONArray ;
+    i:Integer ;
+begin
+  jsarr:=GetArrayFromRoot(name) ;
+
+  dict.Clear() ;
+  for i:=0 to jsarr.Count-1 do
+    {$ifdef fpc}
+    dict.Add((jsarr.Items[i] as TJSONObject).Get('key',''),
+      (jsarr.Items[i] as TJSONObject).Get('value','')) ;
+    {$else}
+    dict.Add((jsarr.Items[i] as TJSONObject).GetValue('key',''),
+      (jsarr.Items[i] as TJSONObject).GetValue('value','')) ;
+    {$endif}
 end;
 
 function TObjectLoader.ReadStringList(name: string; list: TStringList): Boolean;
