@@ -14,6 +14,8 @@ type
 TUniList<T> = class(TFPGList<T>)
 private
 public
+  constructor Create() ; overload ;
+  constructor Create(const src:TUniList<T>) ; overload ;
   procedure AddRange(src:TUniList<T>) ;
   function ExtractAt(idx:Integer):T ;
 end;
@@ -68,6 +70,17 @@ const PATH_SEP = '\' ;
 implementation
 
 {$ifdef fpc}
+
+constructor TUniList<T>.Create();
+begin
+  inherited Create() ;
+end ;
+
+constructor TUniList<T>.Create(const src:TUniList<T>);
+begin
+  inherited Create() ;
+  AddRange(src) ;
+end ;
 
 procedure TUniList<T>.AddRange(src:TUniList<T>) ;
 var el:T ;
