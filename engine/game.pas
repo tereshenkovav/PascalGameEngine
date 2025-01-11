@@ -5,7 +5,7 @@ interface
 uses
   Classes, SysUtils,
   SfmlGraphics,SfmlSystem,SfmlWindow,
-  Scene, Profile, Logger;
+  Scene, Profile, Logger, ScreenSaver;
 
 type
 
@@ -25,6 +25,7 @@ type
     closehandler:TScene ;
     profile:TProfile ;
     logger:TLogger ;
+    screensaver:TScreenSaver ;
     tekfps:Integer ;
     showfpsintitle:Boolean ;
     procedure initNewScene(scene:TScene) ;
@@ -34,14 +35,16 @@ type
     procedure setCustomProfile(profileclass:TProfileClass) ;
     procedure setCustomLogger(loggerclass:TLoggerClass) ;
     procedure enableFPSInTitle(value:Boolean) ;
+    procedure setCustomScreenSaver(Ascreensaver:TScreenSaver) ;
     function getProfile():TProfile ;
     function getLogger():TLogger ;
+    function getGameCode():string ;
     procedure Run(initscene:TScene) ;
     destructor Destroy() ; override ;
   end;
 
 implementation
-uses Helpers ;
+uses Helpers, HomeDir ;
 
 { TGame }
 
@@ -61,7 +64,9 @@ begin
   gamecode:=Agamecode ;
   profile:=TProfile.Create(gamecode) ;
   logger:=TLoggerNull.Create(gamecode) ;
+  screensaver:=TScreenSaverNull.Create() ;
   showfpsintitle:=False ;
+
   if iconfile<>'' then icon:=TSfmlImage.Create(iconfile) else icon:=nil ;
 end ;
 
@@ -74,6 +79,7 @@ var lasttime,newtime,timefps:Single ;
     activescene:TScene ;
     closehandled:Boolean ;
     lastfocused:Boolean ;
+
 label rebuild_window ;
 begin
   profile.Load() ;
@@ -132,6 +138,8 @@ rebuild_window:
     end ;
     activescene.setMousePos(window.MousePosition.X,window.MousePosition.Y) ;
     sr:=activescene.FrameFunc(newtime-lasttime,events) ;
+
+    screensaver.Update(newtime-lasttime,events) ;
 
     if not lastfocused then begin
       if activescene.getOverScene()<>nil then
@@ -217,8 +225,11 @@ rebuild_window:
     if tekscene.getOverScene()<>nil then tekscene.getOverScene().RenderFunc() ;
     if subscene<>nil then subscene.RenderFunc() ;
     window.Display;
+
+    screensaver.DealWithWindowIfNeed(window) ;
   end;
   logger.Free ;
+  screensaver.Free ;
   if tekscene<>closehandler then tekscene.UnInit() ;
   if closehandler<>nil then closehandler.UnInit() ;
 end;
@@ -253,9 +264,19 @@ begin
   showfpsintitle:=value ;
 end;
 
+procedure TGame.setCustomScreenSaver(Ascreensaver:TScreenSaver) ;
+begin
+  screensaver:=Ascreensaver ;
+end;
+
 function TGame.getProfile: TProfile;
 begin
   Result:=profile ;
+end;
+
+function TGame.getGameCode: string;
+begin
+  Result:=gamecode ;
 end;
 
 function TGame.getLogger: TLogger;
