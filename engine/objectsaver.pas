@@ -382,7 +382,7 @@ end;
 function TObjectLoader.getArrayFromRoot(name: string): TJSONArray;
 begin
   {$ifdef fpc}
-  jsroot.Find(name,Result) ;
+  if not jsroot.Find(name,Result) then Result:=nil ;
   {$else}
   Result:=jsroot.Values[name] as TJSONArray ;
   {$endif}
@@ -391,7 +391,7 @@ end;
 function TObjectLoader.getObjectFromRoot(name: string): TJSONObject;
 begin
   {$ifdef fpc}
-  jsroot.Find(name,Result) ;
+  if not jsroot.Find(name,Result) then Result:=nil ;
   {$else}
   Result:=jsroot.Values[name] as TJSONObject ;
   {$endif}
@@ -403,10 +403,12 @@ var jsarr:TJSONArray ;
     i:Integer ;
 begin
   jsarr:=GetArrayFromRoot(name) ;
-
+  if jsarr=nil then Exit(False) ;
+  
   SetLength(arr,jsarr.Count) ;
   for i:=0 to jsarr.Count-1 do
     arr[i]:=StrToInt(jsarr.Items[i].Value) ;
+  Result:=True ;
 end;
 
 function TObjectLoader.ReadArrayString(name: string;
@@ -415,10 +417,12 @@ var jsarr:TJSONArray ;
     i:Integer ;
 begin
   jsarr:=GetArrayFromRoot(name) ;
+  if jsarr=nil then Exit(False) ;
 
   SetLength(arr,jsarr.Count) ;
   for i:=0 to jsarr.Count-1 do
     arr[i]:=jsarr.Items[i].Value ;
+  Result:=True ;
 end;
 
 function TObjectLoader.ReadObject(name: string; obj: TObject;
@@ -437,6 +441,7 @@ begin
   jsarr:=GetArrayFromRoot(name) ;
 
   list.Clear() ;
+  if jsarr=nil then Exit(False) ;
   for i:=0 to jsarr.Count-1 do begin
     obj:=objclass.Create ;
     rapi:=TReaderAPI.Create(jsarr.Items[i] as TJSONObject) ;
@@ -462,8 +467,9 @@ var jsarr:TJsonArray ;
     rapi:TReaderAPI ;
 begin
   jsarr:=GetArrayFromRoot(name) ;
-
   list.Clear() ;
+  if jsarr=nil then Exit(false) ;
+
   for i:=0 to jsarr.Count-1 do begin
     rapi:=TReaderAPI.Create(jsarr.Items[i] as TJSONObject) ;
     reader(@rec,rapi) ;
@@ -482,6 +488,7 @@ begin
   jsarr:=GetArrayFromRoot(name) ;
 
   dict.Clear() ;
+  if jsarr=nil then Exit(False) ;
   for i:=0 to jsarr.Count-1 do
     {$ifdef fpc}
     dict.Add((jsarr.Items[i] as TJSONObject).Get('key',''),
@@ -490,6 +497,7 @@ begin
     dict.Add((jsarr.Items[i] as TJSONObject).GetValue('key',''),
       (jsarr.Items[i] as TJSONObject).GetValue('value','')) ;
     {$endif}
+  Result:=True ;
 end;
 
 function TObjectLoader.ReadStringList(name: string; list: TStringList): Boolean;
@@ -499,8 +507,10 @@ begin
   jsarr:=GetArrayFromRoot(name) ;
 
   list.Clear() ;
+  if jsarr=nil then Exit(False) ;
   for i:=0 to jsarr.Count-1 do
     list.Add(jsarr.Items[i].Value) ;
+  Result:=True ;
 end;
 
 function TObjectLoader.Section(name: string): TReaderAPI;
