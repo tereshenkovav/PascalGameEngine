@@ -42,6 +42,7 @@ type
     procedure drawTextCentered(text:TSfmlText; x,y:Single) ;
     procedure drawTextInBlockWidth(text: TSfmlText; str:string;
       x, y: Single; width:Integer; redlinewidth:Integer);
+    function isMouseOverSprite(spr:TSfmlSprite; spritex,spritey:Single):Boolean ;
   public
     procedure setWindow(Awindow:TSfmlRenderTarget; Awidth,Aheight:Integer);
     procedure setProfile(Aprofile:TProfile) ;
@@ -84,6 +85,14 @@ function TScene.Init():Boolean ;
 begin
   Result:=True ;
 end ;
+
+function TScene.isMouseOverSprite(spr: TSfmlSprite; spritex,
+  spritey: Single): Boolean;
+begin
+  spr.Position:=SfmlVector2f(spritex,spritey) ;
+  Result:=(spr.GlobalBounds.Left<=mousex)and(mousex<=spr.GlobalBounds.Left+spr.GlobalBounds.Width)and
+    (spr.GlobalBounds.Top<=mousey)and(mousey<=spr.GlobalBounds.Top+spr.GlobalBounds.Height) ;
+end;
 
 function TScene.FrameFunc(dt:Single; events:TUniList<TSfmlEventEx>):TSceneResult ;
 begin
