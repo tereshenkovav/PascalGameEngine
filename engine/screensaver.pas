@@ -36,7 +36,7 @@ type
 
 implementation
 uses Math, StrUtils,
-  commonproc, ScriptExecutor, waysearch, HomeDir ;
+  HomeDir ;
 
 type
 

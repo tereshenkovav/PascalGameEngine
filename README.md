@@ -27,9 +27,9 @@ SFML-based game engine for Delphi and FreePascalCompiler.
 
 Для сборки игр на движке нужен либо установленный
 [Delphi](https://delphi.embarcadero.com/)
-(проверено с версиями 10 и 11),
+(проверено с версиями 10, 11, 12),
 либо [FreePascalCompiler](https://www.freepascal.org)
-(проверено с версией 3.0.4)
+(требует версии не ниже 3.2.2)
 
 ## Сборка примера
 
