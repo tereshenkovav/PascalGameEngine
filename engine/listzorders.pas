@@ -5,27 +5,29 @@ uses SfmlGraphics,
   Helpers ;
 
 type
+  TZSprite = record
+    spr:TSfmlSprite ;
+    z:Single ;
+    tag:Integer ;
+    class operator Equal(a: TZSprite; b: TZSprite): Boolean;
+  end ;
+
   TListZOrders = class
-  private
-    type TZSprite = record
-      spr:TSfmlSprite ;
-      z:Single ;
-      class operator Equal(a: TZSprite; b: TZSprite): Boolean;
-    end ;
   private
     list:TUniList<TZSprite> ;
   public
     constructor Create() ;
     destructor Destroy ; override ;
     procedure Clear() ;
-    procedure Add(spr:TSfmlSprite; z:Single) ;
+    procedure Add(spr:TSfmlSprite; z:Single; tag:Integer=0) ;
+    function getSortedZSprites():TUniList<TZSprite> ;
     procedure Render(target:TSfmlRenderTarget) ;
   end;
 
 implementation
 
 const EPS=0.001 ;
-function compareZ(const a:TListZOrders.TZSprite; const b:TListZOrders.TZSprite):Integer ;
+function compareZ(const a:TZSprite; const b:TZSprite):Integer ;
 begin
   if a.z-b.z<-EPS then Result:=1 else
   if a.z-b.z>EPS then Result:=-1 else
@@ -34,11 +36,12 @@ end;
 
 { TListZOrders }
 
-procedure TListZOrders.Add(spr: TSfmlSprite; z: Single);
+procedure TListZOrders.Add(spr: TSfmlSprite; z: Single; tag:Integer);
 var zs:TZSprite ;
 begin
   zs.spr:=spr ;
   zs.z:=z ;
+  zs.tag:=tag ;
   list.Add(zs) ;
 end;
 
@@ -66,9 +69,15 @@ begin
     target.Draw(zs.spr) ;
 end;
 
-{ TListZOrders.TZSprite }
+function TListZOrders.getSortedZSprites():TUniList<TZSprite> ;
+begin
+  list.Sort(compareZ) ;
+  Result:=list ;
+end ;
 
-class operator TListZOrders.TZSprite.Equal(a, b: TZSprite): Boolean;
+{ TZSprite }
+
+class operator TZSprite.Equal(a, b: TZSprite): Boolean;
 begin
   Result:=(a.spr=b.spr)and(a.z=b.z) ;
 end;
