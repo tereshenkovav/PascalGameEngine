@@ -5,7 +5,7 @@ interface
 {$ifdef fpc}
 uses fgl, classes, SysUtils ;
 {$else}
-uses Generics.Collections, Generics.Defaults, IOUtils, SysUtils ;
+uses Generics.Collections, Generics.Defaults, IOUtils, SysUtils, Classes ;
 {$endif}
 
 type
@@ -46,6 +46,7 @@ end;
 
 function readAllText(filename:string):string ;
 procedure writeAllText(filename:string; const data:string) ;
+function getAllFiles(dir:string):TStringList ;
 
 // Конвертирует Int в Str с учетом нуля. Т.е., вернет '', если 0
 function IntToStrWt0(a:Integer):string ;
@@ -164,6 +165,29 @@ end ;
 function StrToIntWt0(s:string):Integer ;
 begin
   if Trim(s)='' then Result:=0 else Result:=StrToInt(s) ;
+end ;
+
+function getAllFiles(dir:string):TStringList ;
+var {$ifdef fpc}
+    searchRec: TSearchRec;
+    {$else}
+    s:string ;
+    {$endif}
+begin
+  Result:=TStringList.Create ;
+  {$ifdef fpc}
+  if dir[dir.Length]<>PATH_SEP then dir:=dir+PATH_SEP ;
+  if FindFirst(dir + '*.*', faAnyFile, searchRec) = 0 then begin
+    repeat
+      if (searchRec.Attr and faDirectory) = 0 then
+        Result.Add(dir+searchRec.Name) ;
+    until FindNext(searchRec) <> 0;
+    FindClose(searchRec) ;
+  end ;
+  {$else}
+  for s in TDirectory.GetFiles(dir) do
+    Result.Add(s) ;
+  {$endif}
 end ;
 
 end.
