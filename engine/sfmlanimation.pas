@@ -27,6 +27,8 @@ type
     procedure Stop() ;
     procedure PlayOnce() ;
     procedure SetFrame(frame:Integer);
+    function getWidth():Integer ;
+    function getHeight():Integer ;
   end;
 
 implementation
@@ -158,5 +160,15 @@ begin
    end ;
    setTexture(frames[tekframe]) ;
 end;
+
+function TSfmlAnimation.getWidth():Integer ;
+begin
+  Result:=frames[0].Size.X ;
+end ;
+
+function TSfmlAnimation.getHeight():Integer ;
+begin
+  Result:=frames[0].Size.Y ;
+end ;
 
 end.
