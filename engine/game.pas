@@ -19,6 +19,7 @@ type
     tekscene: TScene ;
     subscene: TScene ;
     prevscene: TScene ;
+    prevsubscene: TScene ;
     icon:TSfmlImage ;
     title:string ;
     gamecode:string ;
@@ -84,6 +85,7 @@ label rebuild_window ;
 begin
   profile.Load() ;
   prevscene:=nil ;
+  prevsubscene:=nil ;
   subscene:=nil ;
   tekscene:=initscene ;
 rebuild_window:
@@ -156,7 +158,9 @@ rebuild_window:
       TSceneResult.Switch: begin
         if prevscene<>nil then begin
           tekscene:=prevscene ;
+          subscene:=prevsubscene ;
           prevscene:=nil ;
+          prevsubscene:=nil ;
         end
         else begin
         if (subscene<>nil) then begin
@@ -215,7 +219,9 @@ rebuild_window:
       else begin
         if tekscene<>closehandler then begin
           prevscene:=tekscene ;
+          prevsubscene:=subscene ;
           tekscene:=closehandler ;
+          subscene:=nil ;
         end;
       end;
     end ;
